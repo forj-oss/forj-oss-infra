@@ -58,6 +58,13 @@ projects:
   dslpath: jobs-dsl
   infrapath: apps/ci/jenkins
   list:
+    dockercli:
+      name: dockercli
+      sourcetype: github
+      github:
+        apiurl: https://api.github.com/
+        repo: dockercli
+        repoowner: forj-oss
     forj-oss-infra:
       name: forj-oss-infra
       sourcetype: github

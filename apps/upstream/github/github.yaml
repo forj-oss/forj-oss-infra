@@ -2,6 +2,20 @@ urls:
   github-base-url: https://api.github.com/
   github-url: https://github.com
 repos:
+  dockercli:
+    name: dockercli
+    description: a simple basic GO wrapper to docker cli or docker moby/moby
+    issue_tracker: true
+    webhooks:
+      jenkins-github:
+        url: https://jenkins-forjj.eastus.cloudapp.azure.com:443/github-webhook/
+        events:
+        - pull_request
+        - push
+        enabled: "true"
+        sslcheck: false
+        contenttype: form
+    webhookpolicy: sync
   forj-oss-infra:
     name: forj-oss-infra
     description: Forj DevOps infrastructure repository

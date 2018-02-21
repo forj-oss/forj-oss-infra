@@ -38,6 +38,9 @@ repositories:
   go-config-layers:
     title: Provide an advanced configuration system, based on layers in GO.
     issue_tracker: true
+  dockercli:
+    title: a simple basic GO wrapper to docker cli or docker moby/moby
+    issue_tracker: true
 applications:
   github:
     type: upstream
