@@ -1,0 +1,6 @@
+objects:
+  app:
+    flags:
+      feature-credentials-json:
+        help: json data containing jenkins credentials to manage
+        secure: true

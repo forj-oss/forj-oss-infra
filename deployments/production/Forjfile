@@ -43,7 +43,7 @@ groups:
     members: [ "forj-publish" ]
 webhooks:
   slack:
-    url: https://hooks.slack.com/services/{{ .Secret }}
+    url: https://hooks.slack.com/services/${webhooks-slack-slack-id}
     events: commit_comment,create,delete,deployment_status,fork,issue_comment,issues,pull_request,pull_request_review,pull_request_review_comment,push,release
     repos: forj-oss-infra,forjj,forjj-contribs,jenkins-install-inits,jenkins-ci,goforjj,forjj-modules,github-release,forjj-jenkins,forjj-github,jenkins-versions-tool,forjj-repotemplates,forjj-flows
   jenkins-github:

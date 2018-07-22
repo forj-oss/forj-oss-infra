@@ -22,4 +22,5 @@ applications:
     type: ci
     driver: jenkins
     github-user-username: clarsonneur
+    source-templates: forjj
 

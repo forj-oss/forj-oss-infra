@@ -2,6 +2,10 @@ applications:
   github:
     type: upstream
     organization: forjj-test
+  jenkins:
+    type: ci
+    deploy-service-addr: "jenkins-forjj.eastus.cloudapp.azure.com"
+    deploy-service-port: 8080
 users:
   clarsonneur:
     role: owner

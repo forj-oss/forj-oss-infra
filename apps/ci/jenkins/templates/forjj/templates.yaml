@@ -1,0 +1,72 @@
+# This file describes collections of jenkins features and a list of files to generate.
+# Template evaluation Context is defined by .Source = YamlJenkins struct (yaml_jenkins.go)
+---
+features:
+  common:
+  - "feature:jenkins-init"
+  - "feature:proxy"
+  - "{{ if .Source.Projects.DslDefault }}feature:seed-job{{ end }}"
+  - "feature:basic-security"
+  - "{{ if and (.Source.ProjectsHasSource \"github\") (eq (index .Source.AppExtent \"github-auth\") \"true\") }}feature:github-authentication{{ end }}"
+  - "{{ if and (.Source.ProjectsHasSource \"github\") (eq (index .Source.AppExtent \"github-auth\") \"true\") }}feature:github-authorization{{ end }}"
+  - "feature:tcp-slave-agent-port"
+  - "feature:jenkins-pipeline"
+  - "plugin:managed-scripts"
+  - "plugin:embeddable-build-status"
+  - "feature:credentials"
+  - "feature:csrf"
+  - "plugin:config-file-provider"
+  - "{{ if .Source.ProjectsHasSource \"github\" }}feature:multibranch-github-pipeline{{ end }}"
+  - "{{ if .Source.ProjectsHasSource \"bitbucket\" }}plugin:cloudbees-bitbucket-branch-source:2.2.2{{ end }}"
+  - plugin:timestamper
+  - plugin:mask-passwords
+  - plugin:blueocean
+  - plugin:blueocean-github-pipeline
+  - plugin:ws-cleanup
+  deploy:
+    docker:
+    - "feature:yet-another-docker-plugin"
+    ucp:
+    - "feature:yet-another-docker-plugin"
+    mesos:
+    - "feature:mesos-plugin"
+    - "feature:executor"
+    dcos:
+    - "feature:mesos-plugin"
+    - "feature:executor"
+sources:
+  common:
+    docker file:            { template: "Dockerfile"                                                                                                                  }
+    build script:           { template: "bin/build.sh", chmod : 0755                                                                                                  }
+    git ignore:             { template: ".gitignore"                                                                                                                  }
+    build options sample:   { source  : "build_opts.sh.sample"                                                                                                        }
+    jenkins features:       { template: "features.lst"                                                                                                                }
+    Jenkinsfile:            { source  : Jenkinsfile                                                                                                                   }
+    jenkins credentials:    { source  : "jenkins_credentials.sh.sample"                                                                                               }
+    ssl certificate:        { template: "certificate.crt", if: "{{ if (and .Source.Deploy.Ssl.Certificate (eq .Source.Deploy.Ssl.Method \"manual\")) }}true{{ end }}" }
+    pre-installed-plugins:  { source  : jplugins-preinstalled.lst                                                                                                     }
+  deploy:
+    docker:
+      start up script:         { template: "bin/start.sh",        chmod: 0755 }
+      start up options sample: { source  : "run_opts.sh.sample"               }
+      dood install script:     { source : install_dood.sh,        chmod: 0755 }
+run_build:
+  docker:
+    run: "bin/build.sh"
+    environment:
+      DOCKER_REGISTRY_PWD:
+        value: "{{ index .Creds \"app-jenkins-docker-registry-pwd\" }}"
+
+run_deploy:
+  docker:
+    run: "bin/start.sh"
+    environment:
+      CERTIFICATE_KEY:
+        value: "{{ .Creds.SslPrivateKey }}"
+        if: "{{ if (and .Creds.SslPrivateKey (eq .Config.Deploy.Ssl.Method \"manual\") ) }}true{{ end }}"
+      ADMIN_PWD:
+        value: "{{ .Creds.AdminPwd }}"
+        if: "{{ if .Creds.AdminPwd }}true{{ end }}"
+      GITHUB_USER_PASS:
+        value: "{{ .Creds.GithubUserPassword }}"
+        if: "{{ if .Creds.GithubUserPassword }}true{{ end }}"
