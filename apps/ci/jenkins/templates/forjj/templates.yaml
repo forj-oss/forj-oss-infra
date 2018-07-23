@@ -64,7 +64,7 @@ run_deploy:
       CERTIFICATE_KEY:
         value: "{{ .Creds.SslPrivateKey }}"
         if: "{{ if (and .Creds.SslPrivateKey (eq .Config.Deploy.Ssl.Method \"manual\") ) }}true{{ end }}"
-      ADMIN_PWD:
+      SIMPLE_ADMIN_PWD:
         value: "{{ .Creds.AdminPwd }}"
         if: "{{ if .Creds.AdminPwd }}true{{ end }}"
       GITHUB_USER_PASS:

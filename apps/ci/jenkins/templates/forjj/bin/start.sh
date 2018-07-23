@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 #
 
@@ -80,16 +80,18 @@ CONTAINER_IMG="$(sudo docker ps -a -f name={{ .JenkinsImage.Name }}-dood --forma
 
 IMAGE_ID="$(sudo docker images --format "{{ "{{ .ID }}" }}" $IMAGE_NAME)"
 
-if [[ "$ADMIN_PWD" != "" ]]
+if [[ "$SIMPLE_ADMIN_PWD" != "" ]]
 then
-   ADMIN="-e SIMPLE_ADMIN_PWD=\"$ADMIN_PWD\""
+   export SIMPLE_ADMIN_PWD="$ADMIN_PWD"
+   ADMIN="-e SIMPLE_ADMIN_PWD"
    unset ADMIN_PWD
    echo "Admin password set."
 fi
 
 if [[ "$GITHUB_USER_PASS" != "" ]]
 then
-   GITHUB_USER="-e GITHUB_PASS=\"$GITHUB_USER_PASS\""
+   export  GITHUB_PASS="$GITHUB_USER_PASS"
+   GITHUB_USER="-e GITHUB_PASS"
    unset GITHUB_USER_PASS
    echo "Github user password set."
 fi
@@ -105,6 +107,8 @@ fi
 echo "$CERTIFICATE_KEY" > .certificate.key
 unset CERTIFICATE_KEY
 echo "Certificate set."
+
+set -x
 
 JENKINS_OPTS='JENKINS_OPTS=--httpPort=-1 --httpsPort=8443 --httpsCertificate=/tmp/certificate.crt --httpsPrivateKey=/tmp/certificate.key'
 JENKINS_MOUNT="$JENKINS_MOUNT -v ${SRC}certificate.crt:/tmp/certificate.crt -v ${SRC}.certificate.key:/tmp/certificate.key"
@@ -131,7 +135,7 @@ rm -f \$0" > do_restart.sh
 
         echo "The image has been updated. It will be restarted in about 30 seconds"
 {{/* # End of this code to be executed by default if there is no other event driven system (bot/stackstorm/...) */}}\
-        sudo docker run --rm -v $VOL_PWD/do_restart.sh:/tmp/do_restart.sh $DOCKER_DOOD alpine /tmp/do_restart.sh
+        sudo -E docker run --rm -v $VOL_PWD/do_restart.sh:/tmp/do_restart.sh $DOCKER_DOOD alpine /tmp/do_restart.sh
     else
         echo "Nothing to re/start. Jenkins is still accessible at http://$SERVICE_ADDR:$SERVICE_PORT"
     fi
@@ -140,9 +144,9 @@ fi
 
 # No container found. Start it.
 {{ if .Deploy.Ssl.Certificate }}\
-sudo docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
+sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
 {{ else }}
-sudo docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
+sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
 {{ end }}\
 
 if [ $? -ne 0 ]
