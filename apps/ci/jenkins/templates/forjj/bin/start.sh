@@ -111,7 +111,7 @@ echo "Certificate set."
 set -x
 
 JENKINS_OPTS='JENKINS_OPTS=--httpPort=-1 --httpsPort=8443 --httpsCertificate=/tmp/certificate.crt --httpsPrivateKey=/tmp/certificate.key'
-JENKINS_MOUNT="$JENKINS_MOUNT -v ${SRC}certificate.crt:/tmp/certificate.crt -v ${SRC}.certificate.key:/tmp/certificate.key"
+JENKINS_MOUNT="$JENKINS_MOUNT -v ${DEPLOY}certificate.crt:/tmp/certificate.crt -v ${SRC}.certificate.key:/tmp/certificate.key"
 {{ end }}\
 
 if [ "$CONTAINER_IMG" != "" ]
@@ -120,6 +120,9 @@ then
     then
         # TODO: Find a way to stop it safely - Using safe shutdown?
 {{/* # Following code will be executed by default if there is no other event driven system (bot/stackstorm/...) */}}\
+
+        sudo docker rm -f jenkins-restart
+        sudo docker run -id --name jenkins-restart $DOCKER_DOOD alpine /bin/cat
         echo "#!/bin/sh
 sleep 30
 docker rm -f {{ .JenkinsImage.Name }}-dood
@@ -130,12 +133,17 @@ docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e \"$JENKINS_
 docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
 {{ end }}\
 echo 'Service is restarted'
-rm -f \$0" > do_restart.sh
-        chmod +x do_restart.sh
+sleep 1
+docker rm -f jenkins-restart" > do_restart.sh
+        sudo docker cp do_restart.sh jenkins-restart:/tmp/do_restart.sh
+        rm -f do_restart.sh
+        sudo docker exec jenkins-restart chmod +x /tmp/do_restart.sh
 
         echo "The image has been updated. It will be restarted in about 30 seconds"
 {{/* # End of this code to be executed by default if there is no other event driven system (bot/stackstorm/...) */}}\
-        sudo -E docker run --rm -v $VOL_PWD/do_restart.sh:/tmp/do_restart.sh $DOCKER_DOOD alpine /tmp/do_restart.sh
+        set -x
+        sudo -E docker exec jenkins-restart /tmp/do_restart.sh
+        set +x
     else
         echo "Nothing to re/start. Jenkins is still accessible at http://$SERVICE_ADDR:$SERVICE_PORT"
     fi
