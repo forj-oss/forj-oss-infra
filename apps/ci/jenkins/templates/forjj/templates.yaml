@@ -67,6 +67,6 @@ run_deploy:
       SIMPLE_ADMIN_PWD:
         value: "{{ .Creds.AdminPwd }}"
         if: "{{ if .Creds.AdminPwd }}true{{ end }}"
-      GITHUB_USER_PASS:
+      GITHUB_PASS:
         value: "{{ .Creds.GithubUserPassword }}"
         if: "{{ if .Creds.GithubUserPassword }}true{{ end }}"

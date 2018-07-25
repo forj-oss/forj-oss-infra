@@ -82,17 +82,16 @@ IMAGE_ID="$(sudo docker images --format "{{ "{{ .ID }}" }}" $IMAGE_NAME)"
 
 if [[ "$SIMPLE_ADMIN_PWD" != "" ]]
 then
-   export SIMPLE_ADMIN_PWD="$ADMIN_PWD"
+   export SIMPLE_ADMIN_PWD
    ADMIN="-e SIMPLE_ADMIN_PWD"
    unset ADMIN_PWD
    echo "Admin password set."
 fi
 
-if [[ "$GITHUB_USER_PASS" != "" ]]
+if [[ "$GITHUB_PASS" != "" ]]
 then
-   export  GITHUB_PASS="$GITHUB_USER_PASS"
+   export  GITHUB_PASS
    GITHUB_USER="-e GITHUB_PASS"
-   unset GITHUB_USER_PASS
    echo "Github user password set."
 fi
 
