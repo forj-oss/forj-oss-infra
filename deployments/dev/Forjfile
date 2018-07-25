@@ -5,7 +5,33 @@ applications:
   jenkins:
     type: ci
     deploy-service-addr: "jenkins-forjj.eastus.cloudapp.azure.com"
-    deploy-service-port: 8080
+    deploy-service-port: 8443
+    ssl-method: manual
+    ssl-certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIID3DCCAsQCCQCgzOqfF2MlrDANBgkqhkiG9w0BAQUFADCBrzELMAkGA1UEBhMC
+      RlIxDjAMBgNVBAgMBUlzZXJlMREwDwYDVQQHDAhHcmVub2JsZTEQMA4GA1UECgwH
+      Zm9yai5pbzEOMAwGA1UECwwFZm9yamoxMDAuBgNVBAMMJ2plbmtpbnMtZm9yamou
+      ZWFzdHVzLmNsb3VkYXBwLmF6dXJlLmNvbTEpMCcGCSqGSIb3DQEJARYaY2xhcnNv
+      bm5ldXIgYXQgZnJlZSBkb3QgZnIwHhcNMTcwOTEyMTkyNzQ3WhcNMTgwOTEyMTky
+      NzQ3WjCBrzELMAkGA1UEBhMCRlIxDjAMBgNVBAgMBUlzZXJlMREwDwYDVQQHDAhH
+      cmVub2JsZTEQMA4GA1UECgwHZm9yai5pbzEOMAwGA1UECwwFZm9yamoxMDAuBgNV
+      BAMMJ2plbmtpbnMtZm9yamouZWFzdHVzLmNsb3VkYXBwLmF6dXJlLmNvbTEpMCcG
+      CSqGSIb3DQEJARYaY2xhcnNvbm5ldXIgYXQgZnJlZSBkb3QgZnIwggEiMA0GCSqG
+      SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDFToY5sMZVmdsLBC4drTJFDOXIGt3I3HI4
+      yyTng+AJy6Ig+JACq6wT9A1IPL/p3vjrfIwZxUeAUAlHA3Y3/0j9IM7Ebl4NIiOe
+      ekyg894Da5n89Fc77Y5x5Bltoo+SfWHqCqcQH08u7eY/nUccSGIpUDVvxkgUEXfB
+      R9C2nfiQHQ/DtfpX3UnbyFIadqBObFbg2OCCNLVK5hhRJniXktp7YKOcTKbk/d/m
+      is1NdbKHpu+dNYvPf8/7yxLQM06Vf/p2arF1lUmQq21DxnVEdVc5RWpbDNskUUZe
+      dIn30q2ifZuPIpd8i38fKvv0eQt9QZoeAQQj5wt7dcDD+7KEWPX5AgMBAAEwDQYJ
+      KoZIhvcNAQEFBQADggEBAHwC+tWCl2mKwRu+niOAOCk85DFLLbljRo5272fWRBdA
+      F9nQQ/0ONKIRws5IsRLpYMvICq2lgCYoMl3yGmi8hcdcLmECC5/knbst6lEZtNg+
+      1+x8AyPKuFOzWmCC2Npo2CrERS8xTGkBKHdHdISnpgIppCU4Kn6idYK59L5qBcNS
+      DPAztX42s03beEdL4h9/hpcw2nvpZefD9omDUyqW0nSW9PlL8FA0CjVd0+xgeVk3
+      dhbtDqqGGmGc3JVuPxo5rvoVHBz9Dvk5zWbpOAcn+cpf4l9yZf0HO68WzNJt3/Z6
+      S7UdKivzb8q4w7CikG5MsdAAsS56gM43IfdTI5m59rM=
+      -----END CERTIFICATE-----
+
 users:
   clarsonneur:
     role: owner
