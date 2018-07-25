@@ -45,6 +45,7 @@ sources:
     jenkins credentials:    { source  : "jenkins_credentials.sh.sample"                                                                                               }
     ssl certificate:        { template: "certificate.crt", if: "{{ if (and .Source.Deploy.Ssl.Certificate (eq .Source.Deploy.Ssl.Method \"manual\")) }}true{{ end }}" }
     pre-installed-plugins:  { source  : jplugins-preinstalled.lst                                                                                                     }
+    plugins lock file:      { built   : jplugins.lock                                                                                                                 }
   deploy:
     docker:
       start up script:         { template: "bin/start.sh",        chmod: 0755 }
