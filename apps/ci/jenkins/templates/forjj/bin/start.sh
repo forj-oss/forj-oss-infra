@@ -121,15 +121,15 @@ then
 {{/* # Following code will be executed by default if there is no other event driven system (bot/stackstorm/...) */}}\
 
         sudo docker rm -f jenkins-restart
-        sudo docker run -id --name jenkins-restart $DOCKER_DOOD alpine /bin/cat
+        sudo docker run -id --name jenkins-restart $DOCKER_DOOD $GITHUB_USER $ADMIN alpine /bin/cat
         echo "#!/bin/sh
 sleep 30
 docker rm -f {{ .JenkinsImage.Name }}-dood
 sleep 2
 {{ if .Deploy.Ssl.Certificate }}\
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e \"$JENKINS_OPTS\" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e \"$JENKINS_OPTS\" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ else }}
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ end }}\
 echo 'Service is restarted'
 sleep 1
@@ -151,9 +151,9 @@ fi
 
 # No container found. Start it.
 {{ if .Deploy.Ssl.Certificate }}\
-sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
+sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ else }}
-sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $CREDS $PROXY $DOCKER_OPTS $TAG_NAME
+sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ end }}\
 
 if [ $? -ne 0 ]
