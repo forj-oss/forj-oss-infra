@@ -38,7 +38,7 @@ groups:
   Core:
     members: [ "clarsonneur", "ojacques", "wenlock", "homeles", "arneluehrs", "miqui" ]
   Contributors:
-    members: [ "vaceletm" ]
+    members: [ "vaceletm", "uggla", "Xx-Parks-xX" ]
   gerrit:
     members: [ "forj-publish" ]
 webhooks:
@@ -77,4 +77,8 @@ repositories:
     title: a simple basic GO wrapper to docker cli or docker moby/moby
   jenkins-versions-tool:
     title: Simple tool to manage list of plugins in docker images (jenkins master as container)
+  forjj-gitlab:
+    title: Forjj plugin to manage gitlab application through gitlab API
+  forjj-bitbucket:
+    title: Forjj plugin to manage bitbucket application through bitbucket API
     
