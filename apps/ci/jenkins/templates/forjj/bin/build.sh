@@ -84,30 +84,30 @@ IMAGE_BASE={{ .Dockerfile.FromImage }}{{ if .Dockerfile.FromImageVersion }}:{{ .
 #
 # This is required in case we use the docker -v to mount a 'local' volume (from where the docker daemon run).
 set +e
-sudo -n docker rm -f jplugins 2>/dev/null 1>/dev/null
+docker rm -f jplugins 2>/dev/null 1>/dev/null
 set -e
 
 # jplugins check, identify updates and fix version in jplugins.lock
 # If you need to downgrade a plugin version, update the templates.yaml and add your plugin with 'plugins:<myPlugin>:<Version to freeze>'
 # If you need to understand what jplugins do, you can enable the DEBUG mode with -e GOTRACE=true at docker command
-# ex: sudo -n docker exec -e GOTRACE=true jplugins /usr/local/bin/jplugins init --feature-file features.lst --features-repo-path /tmp/jenkins-install-inits
+# ex: docker exec -e GOTRACE=true jplugins /usr/local/bin/jplugins init --feature-file features.lst --features-repo-path /tmp/jenkins-install-inits
 
 
 set -x
-sudo -n docker pull $IMAGE_BASE
-sudo -n -E docker run -di --name jplugins $RUN_PROXY -v $DEPLOY:/src -w /src -u $(id -u):$(id -g) -e LOGNAME $IMAGE_BASE /bin/cat
-sudo -n docker exec -u 0 -i jplugins curl -L -o /usr/bin/docker-lu https://github.com/forj-oss/docker-lu/releases/download/0.1/docker-lu
-sudo -n docker exec -u 0 -i jplugins chmod +x /usr/bin/docker-lu
-sudo -n docker exec -u 0 -i jplugins docker-lu jenkins $(id -u) jenkins $(id -g)
-sudo -n docker exec jplugins git clone https://github.com/forj-oss/jenkins-install-inits /tmp/jenkins-install-inits
-sudo -n docker exec jplugins /usr/local/bin/jplugins init --feature-file features.lst --features-repo-path /tmp/jenkins-install-inits
-sudo -n docker rm -f jplugins
-sudo -n docker build -t $TAG_NAME $FEATURES $PROXY $BUILD_OPTS .
+docker pull $IMAGE_BASE
+docker run -di --name jplugins $RUN_PROXY -v $DEPLOY:/src -w /src -u $(id -u):$(id -g) -e LOGNAME $IMAGE_BASE /bin/cat
+docker exec -u 0 -i jplugins curl -L -o /usr/bin/docker-lu https://github.com/forj-oss/docker-lu/releases/download/0.1/docker-lu
+docker exec -u 0 -i jplugins chmod +x /usr/bin/docker-lu
+docker exec -u 0 -i jplugins docker-lu jenkins $(id -u) jenkins $(id -g)
+docker exec jplugins git clone https://github.com/forj-oss/jenkins-install-inits /tmp/jenkins-install-inits
+docker exec jplugins /usr/local/bin/jplugins init --feature-file features.lst --features-repo-path /tmp/jenkins-install-inits
+docker rm -f jplugins
+docker build -t $TAG_NAME $FEATURES $PROXY $BUILD_OPTS .
 set +x
 
 
 if [ "$AUTO_PUSH" = true ]
 then
    set -x
-   sudo -n docker push $TAG_NAME
+   docker push $TAG_NAME
 fi

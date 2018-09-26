@@ -76,9 +76,9 @@ fi
 TAG_NAME={{ .JenkinsImage.RegistryServer }}/$REPO/$IMAGE_NAME:$IMAGE_VERSION
 
 {{/* Docker uses go template for --format. So need to generate a template go string */}}\
-CONTAINER_IMG="$(sudo docker ps -a -f name={{ .JenkinsImage.Name }}-dood --format "{{ "{{ .Image }}" }}")"
+CONTAINER_IMG="$(docker ps -a -f name={{ .JenkinsImage.Name }}-dood --format "{{ "{{ .Image }}" }}")"
 
-IMAGE_ID="$(sudo docker images --format "{{ "{{ .ID }}" }}" $IMAGE_NAME)"
+IMAGE_ID="$(docker images --format "{{ "{{ .ID }}" }}" $IMAGE_NAME)"
 
 if [[ "$SIMPLE_ADMIN_PWD" != "" ]]
 then
@@ -120,8 +120,8 @@ then
         # TODO: Find a way to stop it safely - Using safe shutdown?
 {{/* # Following code will be executed by default if there is no other event driven system (bot/stackstorm/...) */}}\
 
-        sudo docker rm -f jenkins-restart
-        sudo docker run -id --name jenkins-restart $DOCKER_DOOD $GITHUB_USER $ADMIN alpine /bin/cat
+        docker rm -f jenkins-restart
+        docker run -id --name jenkins-restart $DOCKER_DOOD $GITHUB_USER $ADMIN alpine /bin/cat
         echo "#!/bin/sh
 sleep 30
 docker rm -f {{ .JenkinsImage.Name }}-dood
@@ -134,14 +134,14 @@ docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT
 echo 'Service is restarted'
 sleep 1
 docker rm -f jenkins-restart" > do_restart.sh
-        sudo docker cp do_restart.sh jenkins-restart:/tmp/do_restart.sh
+        docker cp do_restart.sh jenkins-restart:/tmp/do_restart.sh
         rm -f do_restart.sh
-        sudo docker exec jenkins-restart chmod +x /tmp/do_restart.sh
+        docker exec jenkins-restart chmod +x /tmp/do_restart.sh
 
         echo "The image has been updated. It will be restarted in about 30 seconds"
 {{/* # End of this code to be executed by default if there is no other event driven system (bot/stackstorm/...) */}}\
         set -x
-        sudo -E docker exec jenkins-restart /tmp/do_restart.sh
+        docker exec jenkins-restart /tmp/do_restart.sh
         set +x
     else
         echo "Nothing to re/start. Jenkins is still accessible at http://$SERVICE_ADDR:$SERVICE_PORT"
@@ -151,15 +151,15 @@ fi
 
 # No container found. Start it.
 {{ if .Deploy.Ssl.Certificate }}\
-sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ else }}
-sudo -E docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ end }}\
 
 if [ $? -ne 0 ]
 then
     echo "Issue about jenkins startup."
-    sudo docker logs {{ .JenkinsImage.Name }}-dood
+    docker logs {{ .JenkinsImage.Name }}-dood
     exit 1
 fi
 echo "Jenkins has been started and should be accessible at http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT"
