@@ -12,11 +12,6 @@ ENV JENKINS_SLAVE_AGENT_PORT=50000{{ if .Projects.DslDefault }} \
     BUILD_DSL_SCRIPTS={{ .Projects.DslPath }}/*.groovy{{ end }}{{ if .GithubUser.Name }} \
     GITHUB_USER={{ .GithubUser.Name }}{{ end }}
 
-{{ if eq .Deploy.Deployment.To "docker" }}\
-COPY install_dood.sh /tmp
-RUN /tmp/install_dood.sh $DOOD_DOCKER_GROUP
-
-{{ end }}\
 {{ if .Deploy.Ssl.Certificate }}\
 COPY *.crt /var/jenkins_home
 

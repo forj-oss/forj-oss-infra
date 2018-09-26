@@ -50,7 +50,6 @@ sources:
     docker:
       start up script:         { template: "bin/start.sh",        chmod: 0755 }
       start up options sample: { source  : "run_opts.sh.sample"               }
-      dood install script:     { source : install_dood.sh,        chmod: 0755 }
 run_build:
   docker:
     run: "bin/build.sh"
