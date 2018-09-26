@@ -12,8 +12,6 @@ ENV JENKINS_SLAVE_AGENT_PORT=50000{{ if .Projects.DslDefault }} \
     BUILD_DSL_SCRIPTS={{ .Projects.DslPath }}/*.groovy{{ end }}{{ if .GithubUser.Name }} \
     GITHUB_USER={{ .GithubUser.Name }}{{ end }}
 
-USER root
-
 {{ if eq .Deploy.Deployment.To "docker" }}\
 COPY install_dood.sh /tmp
 RUN /tmp/install_dood.sh $DOOD_DOCKER_GROUP
@@ -33,4 +31,3 @@ RUN git clone $JENKINS_INSTALL_INITS_URL /tmp/jenkins-install-inits && \
 
 RUN chown -R jenkins:jenkins $JENKINS_HOME /usr/share/jenkins/ref
 
-USER jenkins
