@@ -83,4 +83,5 @@ repositories:
     title: Forjj plugin to manage bitbucket application through bitbucket API
   docker-lu:
     title: docker-lu is a small GO program to adapt container files, /etc/passwd & /etc/group, with docker host local user UID & GID.
-    
+  jplugins:
+    title: Jenkins plugins managed from code  
