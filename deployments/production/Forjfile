@@ -3,6 +3,7 @@ applications:
     type: ci
     deploy-service-addr: "jenkins-forjj.famille-larsonneur.eu"
     deploy-service-port: 8083
+    deploy-service-url: "https://jenkins-forjj.famille-larsonneur.eu"
     github-user-username: clarsonneur
 users:
   clarsonneur:

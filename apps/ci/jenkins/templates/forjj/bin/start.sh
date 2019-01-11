@@ -113,6 +113,12 @@ JENKINS_OPTS='JENKINS_OPTS=--httpPort=-1 --httpsPort=8443 --httpsCertificate=/tm
 JENKINS_MOUNT="$JENKINS_MOUNT -v ${DEPLOY}certificate.crt:/tmp/certificate.crt -v ${DEPLOY}.certificate.key:/tmp/certificate.key"
 {{ end }}\
 
+PUBLIC_SERVICE_URL=""
+if [[ "$PUBLIC_SERVICE_URL" = "" ]]
+then
+    PUBLIC_SERVICE_URL="http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT"
+fi
+
 if [ "$CONTAINER_IMG" != "" ]
 then
     if [ "$CONTAINER_IMG" != "$TAG_NAME" ] && [ "$CONTAINER_IMG" != "$IMAGE_ID" ]
