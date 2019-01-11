@@ -64,7 +64,7 @@ fi
 
 if [ "$SERVICE_ADDR" = "" ]
 then
-   SERVICE_ADDR="{{ if .Deploy.Deployment.ServiceAddr }}{{.Deploy.Deployment.ServiceAddr}}{{ else }}localhost{{ end }}"
+   SERVICE_ADDR="{{.Deploy.Deployment.ServiceAddr}}"
    echo "SERVICE_ADDR not defined by any deployment environment. Set to '$SERVICE_ADDR'"
 fi
 if [ "$SERVICE_PORT" = "" ]
@@ -72,6 +72,8 @@ then
    SERVICE_PORT={{if and .Deploy.Ssl.Certificate (eq .Deploy.Deployment.ServicePort "8080")}}8443 # Default SSL port{{else}}{{.Deploy.Deployment.ServicePort}}{{end}}
    echo "SERVICE_PORT not defined by any deployment environment. Set to '$SERVICE_PORT'"
 fi
+
+PUBLIC_SERVICE_URL="{{.Deploy.Deployment.PublicServiceUrl}}"
 
 TAG_NAME={{ .JenkinsImage.RegistryServer }}/$REPO/$IMAGE_NAME:$IMAGE_VERSION
 
@@ -112,12 +114,6 @@ set -x
 JENKINS_OPTS='JENKINS_OPTS=--httpPort=-1 --httpsPort=8443 --httpsCertificate=/tmp/certificate.crt --httpsPrivateKey=/tmp/certificate.key'
 JENKINS_MOUNT="$JENKINS_MOUNT -v ${DEPLOY}certificate.crt:/tmp/certificate.crt -v ${DEPLOY}.certificate.key:/tmp/certificate.key"
 {{ end }}\
-
-PUBLIC_SERVICE_URL=""
-if [[ "$PUBLIC_SERVICE_URL" = "" ]]
-then
-    PUBLIC_SERVICE_URL="http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT"
-fi
 
 if [ "$CONTAINER_IMG" != "" ]
 then
@@ -168,4 +164,4 @@ then
     docker logs {{ .JenkinsImage.Name }}-dood
     exit 1
 fi
-echo "Jenkins has been started and should be accessible at http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT"
+echo "Jenkins has been started and should be accessible at $PUBLIC_SERVICE_URL"

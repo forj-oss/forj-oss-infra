@@ -70,3 +70,8 @@ run_deploy:
       GITHUB_PASS:
         value: "{{ .Creds.GithubUserPassword }}"
         if: "{{ if .Creds.GithubUserPassword }}true{{ end }}"
+    files:
+      jenkins-creds.json:
+        content: "{{ index .Creds \"app-jenkins-feature-credentials-json\" }}"
+        if: true
+        remove-when-done: true

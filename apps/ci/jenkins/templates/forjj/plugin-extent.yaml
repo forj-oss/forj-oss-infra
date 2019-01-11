@@ -4,8 +4,3 @@ objects:
       feature-credentials-json:
         help: json data containing jenkins credentials to manage
         secure: true
-    groups:
-      deploy:
-        flags:
-          service-url:
-            help: External Jenkins service url. If Jenkins is accessible through an uncontrolled proxy.
