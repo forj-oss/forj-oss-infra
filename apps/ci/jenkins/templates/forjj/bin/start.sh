@@ -146,7 +146,11 @@ docker rm -f jenkins-restart" > do_restart.sh
         docker exec jenkins-restart /tmp/do_restart.sh
         set +x
     else
-        echo "Nothing to re/start. Jenkins is still accessible at http://$SERVICE_ADDR:$SERVICE_PORT"
+{{ if (eq .Deploy.Type "DEV") }}\
+        echo "Nothing to re/start. Jenkins is still accessible locally at http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT. Public URL: $JENKINS_URL"
+{{ else }}\
+        echo "Nothing to re/start. Jenkins is still accessible at $JENKINS_URL"
+{{ end }}\
     fi
     exit 0
 fi
@@ -164,4 +168,8 @@ then
     docker logs {{ .JenkinsImage.Name }}-dood
     exit 1
 fi
+{{ if (eq .Deploy.Type "DEV") }}\
+echo "Jenkins has been started and would be accessible from the proxy at $JENKINS_URL. Locally the service is at http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT"
+{{ else }}\
 echo "Jenkins has been started and should be accessible at $JENKINS_URL"
+{{ end }}\
