@@ -64,7 +64,7 @@ fi
 
 if [ "$SERVICE_ADDR" = "" ]
 then
-   SERVICE_ADDR="{{ if .Deploy.Deployment.ServiceAddr }}{{.Deploy.Deployment.ServiceAddr}}{{ else }}localhost{{ end }}"
+   SERVICE_ADDR="{{.Deploy.Deployment.ServiceAddr}}"
    echo "SERVICE_ADDR not defined by any deployment environment. Set to '$SERVICE_ADDR'"
 fi
 if [ "$SERVICE_PORT" = "" ]
@@ -72,6 +72,8 @@ then
    SERVICE_PORT={{if and .Deploy.Ssl.Certificate (eq .Deploy.Deployment.ServicePort "8080")}}8443 # Default SSL port{{else}}{{.Deploy.Deployment.ServicePort}}{{end}}
    echo "SERVICE_PORT not defined by any deployment environment. Set to '$SERVICE_PORT'"
 fi
+
+export JENKINS_URL="{{.Deploy.Deployment.PublicServiceUrl}}"
 
 TAG_NAME={{ .JenkinsImage.RegistryServer }}/$REPO/$IMAGE_NAME:$IMAGE_VERSION
 
@@ -127,9 +129,9 @@ sleep 30
 docker rm -f {{ .JenkinsImage.Name }}-dood
 sleep 2
 {{ if .Deploy.Ssl.Certificate }}\
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e \"$JENKINS_OPTS\" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e \"$JENKINS_OPTS\" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ else }}
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ end }}\
 echo 'Service is restarted'
 sleep 1
@@ -144,16 +146,20 @@ docker rm -f jenkins-restart" > do_restart.sh
         docker exec jenkins-restart /tmp/do_restart.sh
         set +x
     else
-        echo "Nothing to re/start. Jenkins is still accessible at http://$SERVICE_ADDR:$SERVICE_PORT"
+{{ if (eq .Deploy.Type "DEV") }}\
+        echo "Nothing to re/start. Jenkins is still accessible locally at http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT. Public URL: $JENKINS_URL"
+{{ else }}\
+        echo "Nothing to re/start. Jenkins is still accessible at $JENKINS_URL"
+{{ end }}\
     fi
     exit 0
 fi
 
 # No container found. Start it.
 {{ if .Deploy.Ssl.Certificate }}\
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+eval docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ else }}
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+eval docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ end }}\
 
 if [ $? -ne 0 ]
@@ -162,4 +168,8 @@ then
     docker logs {{ .JenkinsImage.Name }}-dood
     exit 1
 fi
-echo "Jenkins has been started and should be accessible at http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT"
+{{ if (eq .Deploy.Type "DEV") }}\
+echo "Jenkins has been started and would be accessible from the proxy at $JENKINS_URL. Locally the service is at http{{ if .Deploy.Ssl.Certificate }}s{{ end }}://$SERVICE_ADDR:$SERVICE_PORT"
+{{ else }}\
+echo "Jenkins has been started and should be accessible at $JENKINS_URL"
+{{ end }}\
