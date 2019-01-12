@@ -73,7 +73,7 @@ then
    echo "SERVICE_PORT not defined by any deployment environment. Set to '$SERVICE_PORT'"
 fi
 
-PUBLIC_SERVICE_URL="{{.Deploy.Deployment.PublicServiceUrl}}"
+export JENKINS_URL="{{.Deploy.Deployment.PublicServiceUrl}}"
 
 TAG_NAME={{ .JenkinsImage.RegistryServer }}/$REPO/$IMAGE_NAME:$IMAGE_VERSION
 
@@ -129,9 +129,9 @@ sleep 30
 docker rm -f {{ .JenkinsImage.Name }}-dood
 sleep 2
 {{ if .Deploy.Ssl.Certificate }}\
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e \"$JENKINS_OPTS\" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e \"$JENKINS_OPTS\" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ else }}
-docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ end }}\
 echo 'Service is restarted'
 sleep 1
@@ -153,9 +153,9 @@ fi
 
 # No container found. Start it.
 {{ if .Deploy.Ssl.Certificate }}\
-eval docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+eval docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8443 -e "$JENKINS_OPTS" $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ else }}
-eval docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood $GITHUB_USER $ADMIN $PROXY $TAG_NAME
+eval docker run --restart always $DOCKER_DOOD -d -p $SERVICE_PORT:8080 $JENKINS_MOUNT --name {{ .JenkinsImage.Name }}-dood -e JENKINS_URL $GITHUB_USER $ADMIN $PROXY $TAG_NAME
 {{ end }}\
 
 if [ $? -ne 0 ]
@@ -164,4 +164,4 @@ then
     docker logs {{ .JenkinsImage.Name }}-dood
     exit 1
 fi
-echo "Jenkins has been started and should be accessible at $PUBLIC_SERVICE_URL"
+echo "Jenkins has been started and should be accessible at $JENKINS_URL"
