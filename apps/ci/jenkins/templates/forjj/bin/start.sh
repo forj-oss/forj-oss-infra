@@ -123,7 +123,7 @@ then
 {{/* # Following code will be executed by default if there is no other event driven system (bot/stackstorm/...) */}}\
 
         docker rm -f jenkins-restart
-        docker run -id --name jenkins-restart $DOCKER_DOOD $GITHUB_USER $ADMIN alpine /bin/cat
+        eval docker run -id --name jenkins-restart $DOCKER_DOOD $GITHUB_USER $ADMIN alpine /bin/cat
         echo "#!/bin/sh
 sleep 30
 docker rm -f {{ .JenkinsImage.Name }}-dood
