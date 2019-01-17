@@ -96,6 +96,7 @@ set -e
 set -x
 docker pull $IMAGE_BASE
 docker run -di --name jplugins $RUN_PROXY -v $DEPLOY:/src -w /src -u $(id -u):$(id -g) -e LOGNAME $IMAGE_BASE /bin/cat
+docker exec -u 0 -i jplugins jplugins --version
 docker exec -u 0 -i jplugins curl -L -o /usr/bin/docker-lu https://github.com/forj-oss/docker-lu/releases/download/0.1/docker-lu
 docker exec -u 0 -i jplugins chmod +x /usr/bin/docker-lu
 docker exec -u 0 -i jplugins docker-lu jenkins $(id -u) jenkins $(id -g)
